@@ -1,0 +1,75 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 733cfac546dedc122f256517ed55ef42aa2d463106eb0d5026792741db4b38e4
+
+name:           hocon
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/hocon#readme>
+homepage:       https://github.com/githubuser/hocon#readme
+bug-reports:    https://github.com/githubuser/hocon/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/hocon
+
+library
+  exposed-modules:
+      Data.HOCON
+      Lib
+      Text.Parser.HOCON
+      Text.Parser.HOCON.Internal
+  other-modules:
+      Paths_hocon
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , hspec
+    , parsec <=3.1.14.0
+    , split <=0.2.3.4
+  default-language: Haskell2010
+
+executable hocon-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_hocon
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , hocon
+    , hspec
+    , parsec <=3.1.14.0
+    , split <=0.2.3.4
+  default-language: Haskell2010
+
+test-suite hocon-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Text.Parser.HOCON.InternalSpec
+      Paths_hocon
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , hocon
+    , hspec
+    , parsec <=3.1.14.0
+    , split <=0.2.3.4
+  default-language: Haskell2010
