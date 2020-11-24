@@ -1,3 +1,5 @@
+-- Based off of [this gist for a JSON parser using Parsec](https://gist.github.com/fero23/51f63a33d733055d53b4)
+
 {-# LANGUAGE ExistentialQuantification #-}
 
 module Text.Parser.HOCON.Internal where
