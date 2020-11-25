@@ -2,15 +2,26 @@
 
 {-# LANGUAGE ExistentialQuantification #-}
 
-module Text.Parser.HOCON.Internal where
+module Text.Parser.HOCON.Internal
+  ( objectParser
+  , stringParser
+  , parseProps
+  , parseLabel
+  , arrayParser
+  , numberParser
+  , booleanParser
+  , nullParser
+  , preProcessing
+  , hoconParser
+  )
+where
 
 import Data.HOCON (Config(..))
+import Data.Map (groupBy)
 import Data.List.Split (splitOn)
+import Data.String.Utils (replace, join, strip)
 import Text.ParserCombinators.Parsec
-  (Parser, char, alphaNum, digit, letter, noneOf, oneOf, space, string, between, sepBy, (<?>), (<|>), many, skipMany, try)
-
-eol :: Parser String
-eol = try (string "\n\r") <|> try (string "\r\n") <|> string "\n" <|> string "\r" <?> "EOL"
+  (char, Parser, alphaNum, digit, letter, noneOf, oneOf, space, string, between, sepBy, (<|>), many, skipMany, try)
 
 whitespace :: Parser ()
 whitespace = skipMany space
@@ -94,3 +105,26 @@ splitProp label value = case splitOn "." label of
  where
   join [l     ] value = HOCONNode [(l, value)]
   join (l : ls) value = HOCONNode [(l, join ls value)]
+
+
+preProcessing :: String -> String
+preProcessing =
+  replace "\n" "," . replace "{\n" "{" . replace "\n}" "}" . replace ",\n" "," . join "\n" . map strip . splitOn "\n"
+
+hoconParser :: Parser Config
+hoconParser = do
+  values <- sepBy parseProps (char ',')
+  let grouped = groupAndMerge values
+  return $ HOCONNode grouped
+ where
+  groupAndMerge values = do
+    (key, mixedConfigsAndKeys) <- groupBy fst values
+    let configs = map snd mixedConfigsAndKeys
+    return (key, mergeAll configs)
+
+mergeAll :: [Config] -> Config
+mergeAll = foldl1 merge
+
+merge :: Config -> Config -> Config
+merge (HOCONNode a) (HOCONNode b) = HOCONNode (a ++ b)
+

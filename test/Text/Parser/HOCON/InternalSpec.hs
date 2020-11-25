@@ -3,10 +3,10 @@ module Text.Parser.HOCON.InternalSpec
   )
 where
 
-import Data.HOCON
-import Test.Hspec
-import Text.Parser.HOCON.Internal
-import Text.ParserCombinators.Parsec
+import Data.HOCON (Config(..))
+import Test.Hspec (describe, it, shouldBe, shouldSatisfy, Spec)
+import Text.Parser.HOCON.Internal (arrayParser, numberParser, objectParser, parseProps, stringParser, preProcessing)
+import Text.ParserCombinators.Parsec (parse)
 
 isLeft :: Either a b -> Bool
 isLeft (Left _) = True
@@ -47,3 +47,14 @@ spec = do
     it "fails" $ do
       parse objectParser "object" "{\nfoo = bar\n\"baz\": \"baz\"\n" `shouldSatisfy` isLeft
       parse objectParser "object" "{\nfoo = bar\n\"baz\": \"baz\\n}" `shouldSatisfy` isLeft
+  describe "preProcessing" $ do
+    it "replaces al commas followed by newline with just the coma" $ do
+      preProcessing "foo,\nbar,\nbaz" `shouldBe` "foo,bar,baz"
+      preProcessing "foo, bar, baz" `shouldBe` "foo, bar, baz"
+    it "replaces all opening brackets followed by newline with just the bracket" $ do
+      preProcessing "{\nfoo = bar}" `shouldBe` "{foo = bar}"
+      preProcessing "{foo = bar}" `shouldBe` "{foo = bar}"
+    it "replaces all newlines followed by closing bracket with just the bracket" $ do
+      preProcessing "{foo = bar\n}" `shouldBe` "{foo = bar}"
+      preProcessing "{foo = bar}" `shouldBe` "{foo = bar}"
+      preProcessing "{foo = bar\n  }" `shouldBe` "{foo = bar}"
