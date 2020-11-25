@@ -1,22 +1,30 @@
-module Text.Parser.HOCON where
+module Text.Parser.HOCON
+  ( parseHOCON
+  )
+where
 
-import Data.HOCON
-import Data.Map
-import Text.Parser.HOCON.Internal
-import Text.ParserCombinators.Parsec
+import Data.HOCON (Config(..))
+import Data.Map (groupBy)
+import Data.String.Utils (replace)
+import Text.Parser.HOCON.Internal (objectParser, parseProps)
+import Text.ParserCombinators.Parsec (ParseError, char, Parser, newline, sepBy, (<|>), parse)
+
+parseHOCON :: String -> Either ParseError Config
+parseHOCON = parse hoconParser "hocon" . preProcessing
+
+preProcessing :: String -> String
+preProcessing = replace "\n" "," . replace ",\n" ","
 
 hoconParser :: Parser Config
 hoconParser = do
-  values <- sepBy (objectParser <|> openPropParser) (char ',' <|> char '\n')
-  return $ HOCONList (simplifyAndMerge values)
+  values <- sepBy (objectParser <|> openPropParser) (newline <|> char ',')
+  return $ HOCONList (map simplify values)
  where
   openPropParser = do
     (label, value) <- parseProps
     return $ HOCONNode [(label, value)]
 
-simplifyAndMerge :: [Config] -> [Config]
-simplifyAndMerge []       = []
-simplifyAndMerge (c : cs) = case c of
-  HOCONNode nodes -> let confs = groupBy fst nodes in undefined
-  _               -> c : simplifyAndMerge cs
-  where matchesWith label (label', _) = label == label'
+simplify :: Config -> Config
+simplify (HOCONNode nodes) =
+  let confs = map (\(k, vs) -> (k, HOCONList $ map (simplify . snd) vs)) . groupBy fst $ nodes in HOCONNode confs
+simplify c = c

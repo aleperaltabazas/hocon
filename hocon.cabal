@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2de89b59b704a017a3418319b187379039a1d5a6709e53811d3c3d69e260345e
+-- hash: 10ff9ffdd038d3547fe02a84ce0c58371f6ec4dc401b4d05e2caacc94060d23e
 
 name:           hocon
 version:        0.1.0.0
@@ -37,7 +37,8 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      MissingH <=1.4.3.0
+    , base >=4.7 && <5
     , hspec
     , parsec <=3.1.14.0
     , split <=0.2.3.4
@@ -51,7 +52,8 @@ executable hocon-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      MissingH <=1.4.3.0
+    , base >=4.7 && <5
     , hocon
     , hspec
     , parsec <=3.1.14.0
@@ -69,7 +71,8 @@ test-suite hocon-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      MissingH <=1.4.3.0
+    , base >=4.7 && <5
     , hocon
     , hspec
     , parsec <=3.1.14.0
