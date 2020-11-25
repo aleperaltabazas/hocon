@@ -5,7 +5,6 @@
 module Text.Parser.HOCON.Internal where
 
 import Data.HOCON (Config(..))
-import Data.List (intercalate)
 import Data.List.Split (splitOn)
 import Text.ParserCombinators.Parsec
   (Parser, char, alphaNum, digit, letter, noneOf, oneOf, space, string, between, sepBy, (<?>), (<|>), many, skipMany, try)
