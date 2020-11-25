@@ -3,6 +3,7 @@ module Text.Parser.HOCON
   )
 where
 
+import Data.Bifunctor
 import Data.HOCON (Config(..))
 import Data.Map (groupBy)
 import Data.String.Utils (replace)
@@ -17,14 +18,20 @@ preProcessing = replace "\n" "," . replace ",\n" ","
 
 hoconParser :: Parser Config
 hoconParser = do
-  values <- sepBy (objectParser <|> openPropParser) (newline <|> char ',')
-  return $ HOCONList (map simplify values)
+  values <- sepBy (openObjectParser <|> parseProps) (char ',')
+  let grouped = groupAndMerge values
+  return $ HOCONNode grouped
  where
-  openPropParser = do
-    (label, value) <- parseProps
-    return $ HOCONNode [(label, value)]
+  openObjectParser = do
+    object <- objectParser
+    return ("root", object)
+  groupAndMerge values = do
+    (key, mixedConfigsAndKeys) <- groupBy fst values
+    let configs = map snd mixedConfigsAndKeys
+    return (key, mergeAll configs)
 
-simplify :: Config -> Config
-simplify (HOCONNode nodes) =
-  let confs = map (\(k, vs) -> (k, HOCONList $ map (simplify . snd) vs)) . groupBy fst $ nodes in HOCONNode confs
-simplify c = c
+mergeAll :: [Config] -> Config
+mergeAll = foldl1 merge
+
+merge :: Config -> Config -> Config
+merge (HOCONNode a) (HOCONNode b) = HOCONNode (a ++ b)
