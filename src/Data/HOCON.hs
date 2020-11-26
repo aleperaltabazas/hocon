@@ -9,6 +9,7 @@ module Data.HOCON
   , isNull
   , mapNode
   , getConfig
+  , pretty
   )
 where
 
@@ -16,6 +17,7 @@ import Data.List (find)
 import Data.List.Split (splitOn)
 import Data.Map (Map)
 import Data.Maybe (isJust)
+import Data.String.Utils (join)
 
 data Config =
   HOCONNode (Map String Config) |
@@ -87,3 +89,11 @@ hasPath key = isJust . getConfig key
 getNodes :: Config -> Maybe [(String, Config)]
 getNodes (HOCONNode nodes) = Just nodes
 getNodes _                 = Nothing
+
+pretty :: Config -> String
+pretty HOCONNull           = "null"
+pretty (HOCONNumber n    ) = show n
+pretty (HOCONString s    ) = "\"" ++ s ++ "\""
+pretty (HOCONBool   b    ) = if b then "true" else "false"
+pretty (HOCONList   xs   ) = "[" ++ (join "," . map pretty $ xs) ++ "]"
+pretty (HOCONNode   nodes) = "{" ++ (join "," . map (\(k, node) -> "\"" ++ k ++ "\":" ++ pretty node) $ nodes) ++ "}"

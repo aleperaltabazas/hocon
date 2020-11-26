@@ -43,7 +43,7 @@ parseStr = between (char '\"') (char '\"') (many $ noneOf "\"" <|> try (string "
 parseOpenStr :: Parser String
 parseOpenStr = do
   l   <- letter
-  str <- many (alphaNum <|> char '.')
+  str <- many (alphaNum <|> oneOf "._-")
   return $ l : str
 
 parseProps :: Parser (String, Config)
