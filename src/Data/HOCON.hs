@@ -8,6 +8,7 @@ module Data.HOCON
   , getBool
   , isNull
   , mapNode
+  , getConfig
   )
 where
 
