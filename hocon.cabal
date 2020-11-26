@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10ff9ffdd038d3547fe02a84ce0c58371f6ec4dc401b4d05e2caacc94060d23e
+-- hash: 72f04a2df48bcf6300a0e7e5dbe0f4456dbfec9cfa1aa6bdc42935e6fbd17874
 
 name:           hocon
 version:        0.1.0.0
@@ -27,9 +27,9 @@ source-repository head
 
 library
   exposed-modules:
+      Data.Bifunctor.Extra
       Data.HOCON
       Data.Map
-      Lib
       Text.Parser.HOCON
       Text.Parser.HOCON.Internal
   other-modules:

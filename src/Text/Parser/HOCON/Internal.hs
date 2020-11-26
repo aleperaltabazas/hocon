@@ -16,12 +16,13 @@ module Text.Parser.HOCON.Internal
   )
 where
 
-import Data.HOCON (Config(..))
-import Data.Map (groupBy)
+import Data.Bifunctor.Extra (mapValues)
+import Data.HOCON (Config(..), mapNode)
 import Data.List.Split (splitOn)
+import Data.Map (groupBy, sortByKey)
 import Data.String.Utils (replace, join, strip)
 import Text.ParserCombinators.Parsec
-  (char, Parser, alphaNum, digit, letter, noneOf, oneOf, space, string, between, sepBy, (<|>), many, skipMany, try)
+  (char, Parser, alphaNum, digit, letter, noneOf, oneOf, space, string, between, sepBy, (<|>), many, many1, skipMany, try)
 
 whitespace :: Parser ()
 whitespace = skipMany space
@@ -66,7 +67,7 @@ parseLabel = do
 numberParser :: Parser Config
 numberParser = do
   whitespace
-  digits <- many (digit <|> oneOf ".-")
+  digits <- many1 (digit <|> oneOf ".-")
   whitespace
   return . HOCONNumber $ read digits
 
@@ -112,10 +113,11 @@ preProcessing =
   replace "\n" "," . replace "{\n" "{" . replace "\n}" "}" . replace ",\n" "," . join "\n" . map strip . splitOn "\n"
 
 hoconParser :: Parser Config
-hoconParser = do
+hoconParser = objectParser <|> do
   values <- sepBy parseProps (char ',')
   let grouped = groupAndMerge values
-  return $ HOCONNode grouped
+  let sorted = mapValues (mapNode (HOCONNode . sortByKey)) . sortByKey $ grouped
+  return $ HOCONNode sorted
  where
   groupAndMerge values = do
     (key, mixedConfigsAndKeys) <- groupBy fst values

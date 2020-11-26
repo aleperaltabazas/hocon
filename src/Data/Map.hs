@@ -1,4 +1,9 @@
-module Data.Map where
+module Data.Map
+  ( groupBy
+  , sortByKey
+  , Map
+  )
+where
 
 import Data.List (sortBy)
 
@@ -14,3 +19,6 @@ groupBy f vs = sortBy (\(k1, _) (k2, _) -> compare k1 k2) $ go f (vs, [])
       append key value (k, v) = if key == k then (k, value : v) else (k, v)
       acc' = if any (\(k', _) -> k' == f v) acc then map (append (f v) v) acc else (f v, [v]) : acc
     in go f (vs, acc')
+
+sortByKey :: (Ord k) => Map k v -> Map k v
+sortByKey = sortBy (\a b -> compare (fst a) (fst b))

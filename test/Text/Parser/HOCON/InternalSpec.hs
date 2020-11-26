@@ -5,7 +5,7 @@ where
 
 import Data.HOCON (Config(..))
 import Test.Hspec (describe, it, shouldBe, shouldSatisfy, Spec)
-import Text.Parser.HOCON.Internal (arrayParser, numberParser, objectParser, parseProps, stringParser, preProcessing)
+import Text.Parser.HOCON.Internal (arrayParser, numberParser, objectParser, parseProps, stringParser, hoconParser, preProcessing)
 import Text.ParserCombinators.Parsec (parse)
 
 isLeft :: Either a b -> Bool
@@ -47,6 +47,8 @@ spec = do
     it "fails" $ do
       parse objectParser "object" "{\nfoo = bar\n\"baz\": \"baz\"\n" `shouldSatisfy` isLeft
       parse objectParser "object" "{\nfoo = bar\n\"baz\": \"baz\\n}" `shouldSatisfy` isLeft
+      parse objectParser "object" "{" `shouldSatisfy` isLeft
+
   describe "preProcessing" $ do
     it "replaces al commas followed by newline with just the coma" $ do
       preProcessing "foo,\nbar,\nbaz" `shouldBe` "foo,bar,baz"
@@ -58,3 +60,15 @@ spec = do
       preProcessing "{foo = bar\n}" `shouldBe` "{foo = bar}"
       preProcessing "{foo = bar}" `shouldBe` "{foo = bar}"
       preProcessing "{foo = bar\n  }" `shouldBe` "{foo = bar}"
+
+  describe "hoconParser" $ do
+    it "succeeds" $ do
+      parse hoconParser "hocon" "{}" `shouldBe` Right (HOCONNode [])
+      parse hoconParser "hocon" "foo = bar" `shouldBe` Right (HOCONNode [("foo", HOCONString "bar")])
+      parse hoconParser "hocon" "foo = bar,bar = 123"
+        `shouldBe` Right (HOCONNode [("bar", HOCONNumber 123), ("foo", HOCONString "bar")])
+      parse hoconParser "hocon" "foo = \"bar?!\",bar {baz = 123}"
+        `shouldBe` Right (HOCONNode [("bar", HOCONNode [("baz", HOCONNumber 123)]), ("foo", HOCONString "bar?!")])
+    it "fails" $ do
+      parse hoconParser "hocon" "{" `shouldSatisfy` isLeft
+      parse hoconParser "hocon" "foo =" `shouldSatisfy` isLeft

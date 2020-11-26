@@ -7,6 +7,7 @@ module Data.HOCON
   , getList
   , getBool
   , isNull
+  , mapNode
   )
 where
 
@@ -27,6 +28,10 @@ data Config =
 isNull :: Config -> Bool
 isNull HOCONNull = True
 isNull _         = False
+
+mapNode :: (Map String Config -> Config) -> Config -> Config
+mapNode f (HOCONNode nodes) = f nodes
+mapNode _ conf              = conf
 
 getNode :: String -> Config -> Maybe (Map String Config)
 getNode key conf = do
