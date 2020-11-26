@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 72f04a2df48bcf6300a0e7e5dbe0f4456dbfec9cfa1aa6bdc42935e6fbd17874
+-- hash: 12270ead08a8273a5e886852616f4732e424ebe6ce7641968b4c92725e95f0c8
 
 name:           hocon
 version:        0.1.0.0
@@ -66,6 +66,7 @@ test-suite hocon-test
   other-modules:
       Data.MapSpec
       Text.Parser.HOCON.InternalSpec
+      Text.Parser.HOCONSpec
       Paths_hocon
   hs-source-dirs:
       test
