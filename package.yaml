@@ -1,5 +1,5 @@
 name: hocon
-version: 0.1.0.1
+version: 0.1.0.2
 github: "aleperaltabazas/hocon"
 license: BSD3
 author: "Alejandro Peralta Bazas"
@@ -10,13 +10,13 @@ extra-source-files:
     - README.md
     - ChangeLog.md
 
-synopsis: Small library for typesafe's configuration specification 
+synopsis: Small library for typesafe's configuration specification
 category: Data
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description: Small library for typesafe's configuration specification 
+description: Small library for typesafe's configuration specification
 
 dependencies:
     - base >= 4.7 && < 5
