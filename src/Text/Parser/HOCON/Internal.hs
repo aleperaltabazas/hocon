@@ -13,13 +13,14 @@ module Text.Parser.HOCON.Internal
   , nullParser
   , preProcessing
   , hoconParser
+  , postProcessing
   )
 where
 
 import Data.Bifunctor.Extra (mapValues)
 import Data.HOCON (Config(..), mapNode)
 import Data.List.Split (splitOn)
-import Data.Map (groupBy, sortByKey)
+import Data.Map (groupBy, sortByKey, Map)
 import Data.String.Utils (replace, join, strip)
 import Text.ParserCombinators.Parsec
   (char, Parser, alphaNum, digit, letter, noneOf, oneOf, space, string, between, sepBy, (<|>), many, many1, skipMany, try)
@@ -81,7 +82,7 @@ stringParser = do
 booleanParser :: Parser Config
 booleanParser = do
   whitespace
-  bool <- string "true" <|> string "false"
+  bool <- try (string "true" <|> string "false")
   whitespace
   return $ if bool == "true" then HOCONBool True else HOCONBool False
 
@@ -110,23 +111,44 @@ splitProp label value = case splitOn "." label of
 
 preProcessing :: String -> String
 preProcessing =
-  replace "\n" "," . replace "[\n" "[" . replace "\n]" "]" . replace "{\n" "{" . replace "\n}" "}" . replace ",\n" "," . join "\n" . map strip . splitOn "\n"
+  replace "\n" ","
+    . replace "[\n" "["
+    . replace "\n]" "]"
+    . replace "{\n" "{"
+    . replace "\n}" "}"
+    . replace ",\n" ","
+    . join "\n"
+    . map strip
+    . splitOn "\n"
+
+postProcessing :: Config -> Config
+postProcessing (HOCONNode nodes) = HOCONNode . sort . removeDuplicates . group $ nodes
+
+group :: Map String Config -> Map String Config
+group nodes = do
+  let grouped = groupBy fst nodes
+  (key, configs) <- mapValues (map snd) grouped
+  return (key, if all isNode configs then mergeAll configs else head configs)
+ where
+  isNode n = case n of
+    HOCONNode _ -> True
+    _           -> False
+
+sort :: Map String Config -> Map String Config
+sort = sortByKey
 
 hoconParser :: Parser Config
-hoconParser = objectParser <|> do
-  values <- sepBy parseProps (char ',')
-  let grouped = groupAndMerge values
-  let sorted = mapValues (mapNode (HOCONNode . sortByKey)) . sortByKey $ grouped
-  return $ HOCONNode sorted
+hoconParser = postProcessing <$> parser
  where
-  groupAndMerge values = do
-    (key, mixedConfigsAndKeys) <- groupBy fst values
-    let configs = map snd mixedConfigsAndKeys
-    return (key, mergeAll configs)
+  parser = objectParser <|> do
+    values <- sepBy parseProps (char ',')
+    return $ HOCONNode values
+
+removeDuplicates :: Map String Config -> Map String Config
+removeDuplicates = foldl (\acc e -> if any ((== fst e) . fst) acc then acc else e : acc) []
 
 mergeAll :: [Config] -> Config
 mergeAll = foldl1 merge
 
 merge :: Config -> Config -> Config
 merge (HOCONNode a) (HOCONNode b) = HOCONNode (a ++ b)
-

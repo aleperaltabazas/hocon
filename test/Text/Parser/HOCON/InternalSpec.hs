@@ -5,7 +5,8 @@ where
 
 import Data.HOCON (Config(..))
 import Test.Hspec (describe, it, shouldBe, shouldSatisfy, Spec)
-import Text.Parser.HOCON.Internal (arrayParser, numberParser, objectParser, parseProps, stringParser, hoconParser, preProcessing)
+import Text.Parser.HOCON.Internal
+  (arrayParser, numberParser, objectParser, parseProps, stringParser, hoconParser, preProcessing, postProcessing)
 import Text.ParserCombinators.Parsec (parse)
 
 isLeft :: Either a b -> Bool
@@ -60,6 +61,13 @@ spec = do
       preProcessing "{foo = bar\n}" `shouldBe` "{foo = bar}"
       preProcessing "{foo = bar}" `shouldBe` "{foo = bar}"
       preProcessing "{foo = bar\n  }" `shouldBe` "{foo = bar}"
+
+  describe "postProcessing" $ it "groups all object with the same key, removes duplicates and sorts them" $ do
+    postProcessing (HOCONNode [("foo", HOCONString "bar")]) `shouldBe` HOCONNode [("foo", HOCONString "bar")]
+    postProcessing (HOCONNode [("foo", HOCONNode [("foo", HOCONString "bar")]), ("foo", HOCONNode [("bar", HOCONString "foo")])])
+      `shouldBe` HOCONNode [("foo", HOCONNode [("bar", HOCONString "foo"), ("foo", HOCONString "bar")])]
+    postProcessing (HOCONNode [("foo", HOCONString "bar"), ("foo", HOCONNumber 123)])
+      `shouldBe` HOCONNode [("foo", HOCONNumber 123)]
 
   describe "hoconParser" $ do
     it "succeeds" $ do

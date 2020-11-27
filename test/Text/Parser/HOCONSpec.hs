@@ -14,6 +14,13 @@ spec = describe "parseHOCON" $ do
     parseHOCON "foo = bar" `shouldBe` Right (HOCONNode [("foo", HOCONString "bar")])
     parseHOCON "foo = bar\nbar = 123\nbaz = \"nani?!\""
       `shouldBe` Right (HOCONNode [("bar", HOCONNumber 123), ("baz", HOCONString "nani?!"), ("foo", HOCONString "bar")])
+    parseHOCON "foo = bar\nbar = true\nsomeObject {\n  someField = [\n    foo,\n    bar,\n    baz\n  ]\n}" `shouldBe` Right
+      (HOCONNode
+        [ ("bar"       , HOCONBool True)
+        , ("foo"       , HOCONString "bar")
+        , ("someObject", HOCONNode [("someField", HOCONList [HOCONString "foo", HOCONString "bar", HOCONString "baz"])])
+        ]
+      )
   it "fails" $ do
     parseHOCON "foo = bar\n{\n  foo = bar\n}" `shouldSatisfy` isLeft
     parseHOCON "{" `shouldSatisfy` isLeft
