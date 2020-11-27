@@ -18,7 +18,7 @@ module Text.Parser.HOCON.Internal
 where
 
 import Data.Bifunctor.Extra (mapValues)
-import Data.HOCON (Config(..), mapNode)
+import Data.HOCON (Config(..))
 import Data.List.Split (splitOn)
 import Data.Map (groupBy, sortByKey, Map)
 import Data.String.Utils (replace, join, strip)
