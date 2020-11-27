@@ -110,7 +110,7 @@ splitProp label value = case splitOn "." label of
 
 preProcessing :: String -> String
 preProcessing =
-  replace "\n" "," . replace "{\n" "{" . replace "\n}" "}" . replace ",\n" "," . join "\n" . map strip . splitOn "\n"
+  replace "\n" "," . replace "[\n" "[" . replace "\n]" "]" . replace "{\n" "{" . replace "\n}" "}" . replace ",\n" "," . join "\n" . map strip . splitOn "\n"
 
 hoconParser :: Parser Config
 hoconParser = objectParser <|> do

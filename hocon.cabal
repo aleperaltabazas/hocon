@@ -4,11 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dd6660d97f0287c871c18b04b93662305728ae1e2249c076c00f575fe81eb0a8
+-- hash: 479320fd325338bd94374a5beb7a949a9bb9804fc9b507fc863a1a4ad2f84b81
 
 name:           hocon
-version:        0.1.0.0
+version:        0.1.0.1
+synopsis:       Small library for typesafe's configuration specification
 description:    Small library for typesafe's configuration specification
+category:       Data
 homepage:       https://github.com/aleperaltabazas/hocon#readme
 bug-reports:    https://github.com/aleperaltabazas/hocon/issues
 author:         Alejandro Peralta Bazas
