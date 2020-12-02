@@ -28,17 +28,6 @@ dependencies:
 library:
     source-dirs: src
 
-executables:
-    hocon-exe:
-        main: Main.hs
-        source-dirs: app
-        ghc-options:
-            - -threaded
-            - -rtsopts
-            - -with-rtsopts=-N
-        dependencies:
-            - hocon
-
 tests:
     hocon-test:
         main: Spec.hs
