@@ -118,6 +118,7 @@ preProcessing =
     . replace "\n}" "}"
     . replace ",\n" ","
     . join "\n"
+    . filter (not . null)
     . map strip
     . splitOn "\n"
 

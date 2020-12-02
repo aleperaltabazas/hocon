@@ -61,6 +61,9 @@ spec = do
       preProcessing "{foo = bar\n}" `shouldBe` "{foo = bar}"
       preProcessing "{foo = bar}" `shouldBe` "{foo = bar}"
       preProcessing "{foo = bar\n  }" `shouldBe` "{foo = bar}"
+    it "removes blank lines" $ do
+      preProcessing "foo\n\nbar" `shouldBe` "foo,bar"
+      preProcessing "foo\nbar\n" `shouldBe` "foo,bar"
 
   describe "postProcessing" $ it "groups all object with the same key, removes duplicates and sorts them" $ do
     postProcessing (HOCONNode [("foo", HOCONString "bar")]) `shouldBe` HOCONNode [("foo", HOCONString "bar")]
