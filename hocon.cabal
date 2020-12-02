@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 57d92299e51015ab0120e310c504bfe58f32cf569bef89056406de73fac4ab6a
+-- hash: 82af7ad22d9205b7edfba1a74c46352dce9e775f053c18845b65eca87f2c909f
 
 name:           hocon
-version:        0.1.0.3
+version:        0.1.0.4
 synopsis:       Small library for typesafe's configuration specification
 description:    Small library for typesafe's configuration specification
 category:       Data
